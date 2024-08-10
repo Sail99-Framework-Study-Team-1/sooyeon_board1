@@ -6,6 +6,7 @@ import com.example.board_sooyeon01.service.BoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -28,10 +29,9 @@ public class BoardController {
         return "boardwrite";
     }
 
-    @PostMapping("/board/writedopro")
+    @PostMapping("/board/writepro")
     public String boardWritePro(Board board){
 
-        //System.out.println(board.getTitle());
         boardService.write(board);
         return "";
     }
@@ -42,5 +42,36 @@ public class BoardController {
 
         return "boardlist";
 
+    }
+
+    @GetMapping("/board/view")//localhost:8080/board/view?id=1 (파라미터 겟방식)
+    public String boardView(Model model,int id){
+        model.addAttribute("board",boardService.boardView(id) );
+        return "boardview";
+    }
+
+    @GetMapping("/board/delete")//localhost:8080/board/view?id=1 (파라미터 겟방식)
+    public String boarddelete(int id){
+        boardService.boardDelete(id);
+
+        return "redirect:/board/list";
+    }
+
+    @GetMapping("/board/modify/{id}")
+    public String boardmodify(@PathVariable("id") Integer id, Model model){
+        model.addAttribute("board",boardService.boardView(id));
+
+        return "boardmodify";
+    }
+
+    @PostMapping("/board/update/{id}")
+    public String boardUpate(@PathVariable("id") Integer id, Board board){
+
+        Board boardTemp = boardService.boardView(id);
+        boardTemp.setTitle(board.getTitle());
+        boardTemp.setContent(board.getContent());  //덮어씌움
+
+        boardService.write(boardTemp);
+        return "redirect:/board/list";
     }
 }
